@@ -22,6 +22,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/MotionPathPlugin.min.js"></script> 
+
 
     <!-- Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -29,7 +31,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Roboto+Mono&display=swap" rel="stylesheet">
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -43,21 +45,7 @@
             overflow-x: hidden;
         }
         #three-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-        .card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            transition: box-shadow 0.3s, transform 0.3s;
-        }
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
         }
         .gradient-text {
             background: linear-gradient(to right, #18E2D4, #1F6BFF);
@@ -67,18 +55,85 @@
         .gradient-bg {
             background-image: linear-gradient(to right, #18E2D4, #1F6BFF);
         }
-        .nav-link.active {
-            color: #007BFF;
+        .nav-link.active { color: #007BFF; }
+        .typing-cursor { animation: blink 0.7s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- Flip Card Styles --- */
+        .flip-card {
+            background-color: transparent;
+            width: 100%;
+            height: 400px; /* Adjusted height for mobile */
+            perspective: 1000px;
         }
-        .nav-link.active .underline-span {
-            transform: scaleX(1);
-            background-image: linear-gradient(to right, #18E2D4, #1F6BFF);
+        @media (min-width: 768px) {
+            .flip-card {
+                height: 450px; /* Taller height for desktop */
+            }
         }
-        .typing-cursor {
-            animation: blink 0.7s infinite;
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 15px 0 rgba(0,0,0,0.1);
+            border-radius: 0.75rem;
         }
-        @keyframes blink {
-            50% { opacity: 0; }
+        .flip-card:hover .flip-card-inner,
+        .flip-card.is-flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+        .flip-card-front {
+            background-color: #FFFFFF;
+            color: black;
+        }
+        .flip-card-back {
+            color: white;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 1.5rem; /* p-6 */
+        }
+        
+        /* --- Journey/Blueprint Styles --- */
+        .journey-blueprint {
+            background-color: #0a192f; /* Deep Blue */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 2rem 2rem;
+        }
+        #journey-blueprint-path {
+            stroke-dasharray: 1;
+            stroke-dashoffset: 1;
+        }
+        .milestone-icon, .milestone-text {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .milestone-text {
+            transition-delay: 0.3s;
+        }
+        .card { /* For skills section */
+            background: white;
+            border: 1px solid #e5e7eb;
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
     </style>
 </head>
@@ -92,33 +147,18 @@
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
                 <a href="#about" class="flex items-center gap-2 text-gray-800 hover:text-blue-600 transition-colors duration-300">
-                    <svg class="w-8 h-8 text-blue-600" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M17.5 13C19.43 13 21 11.43 21 9.5C21 7.57 19.43 6 17.5 6C15.57 6 14 7.57 14 9.5C14 11.43 15.57 13 17.5 13ZM17.5 8C18.33 8 19 8.67 19 9.5C19 10.33 18.33 11 17.5 11C16.67 11 16 10.33 16 9.5C16 8.67 16.67 8 17.5 8Z" />
-                        <path d="M12.26 15.15C12.07 14.47 11.53 14 10.81 14H4.28C4.09 14 3.91 14.04 3.75 14.1C4.68 12.91 6.2 12.25 8 12.25C9.05 12.25 10.03 12.54 10.81 13.04L12.23 12.2C11.14 11.5 9.68 11 8 11C5.24 11 3 13.24 3 16C3 18.76 5.24 21 8 21C10.76 21 13 18.76 13 16C13 15.73 12.95 15.47 12.87 15.22L12.26 15.15Z" />
-                        <path d="M8 19C6.34 19 5 17.66 5 16C5 14.34 6.34 13 8 13C9.66 13 11 14.34 11 16C11 17.66 9.66 19 8 19Z" />
-                    </svg>
+                    <svg class="w-8 h-8 text-blue-600" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17.5 13C19.43 13 21 11.43 21 9.5C21 7.57 19.43 6 17.5 6C15.57 6 14 7.57 14 9.5C14 11.43 15.57 13 17.5 13ZM17.5 8C18.33 8 19 8.67 19 9.5C19 10.33 18.33 11 17.5 11C16.67 11 16 10.33 16 9.5C16 8.67 16.67 8 17.5 8Z" /><path d="M12.26 15.15C12.07 14.47 11.53 14 10.81 14H4.28C4.09 14 3.91 14.04 3.75 14.1C4.68 12.91 6.2 12.25 8 12.25C9.05 12.25 10.03 12.54 10.81 13.04L12.23 12.2C11.14 11.5 9.68 11 8 11C5.24 11 3 13.24 3 16C3 18.76 5.24 21 8 21C10.76 21 13 18.76 13 16C13 15.73 12.95 15.47 12.87 15.22L12.26 15.15Z" /><path d="M8 19C6.34 19 5 17.66 5 16C5 14.34 6.34 13 8 13C9.66 13 11 14.34 11 16C11 17.66 9.66 19 8 19Z" /></svg>
                     <span class="text-xl font-bold">Manideep</span>
                 </a>
-                <nav id="desktop-nav" class="hidden md:flex items-center space-x-8">
-                    <!-- Nav links will be injected by JS -->
-                </nav>
-                <div class="flex items-center">
-                    <button id="menu-btn" class="md:hidden ml-4 p-2 text-gray-700">
-                        <i data-lucide="menu" class="w-7 h-7"></i>
-                    </button>
-                </div>
+                <nav id="desktop-nav" class="hidden md:flex items-center space-x-8"></nav>
+                <button id="menu-btn" class="md:hidden ml-4 p-2 text-gray-700"><i data-lucide="menu" class="w-7 h-7"></i></button>
             </div>
         </div>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-sm">
-            <nav id="mobile-nav" class="flex flex-col items-center space-y-6 py-8">
-                 <!-- Mobile nav links will be injected by JS -->
-            </nav>
-        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white/95 backdrop-blur-sm"><nav id="mobile-nav" class="flex flex-col items-center space-y-6 py-8"></nav></div>
     </header>
 
     <div class="relative z-10">
-        <main class="container mx-auto px-6 md:px-10">
+        <main class="container mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Hero Section -->
             <section id="about" class="min-h-screen flex items-center pt-20 py-20 md:py-28">
                 <div class="container mx-auto grid md:grid-cols-2 gap-12 items-center">
@@ -128,20 +168,12 @@
                         </h1>
                         <p class="hero-element text-lg text-gray-600 max-w-xl mx-auto md:mx-0 mb-8" id="hero-bio"></p>
                         <div class="hero-element flex flex-col sm:flex-row justify-center md:justify-start items-center gap-4">
-                            <a href="#contact" class="w-full sm:w-auto gradient-bg text-white font-bold py-4 px-8 rounded-lg hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">
-                                Contact Me
-                            </a>
-                            <a href="#projects" class="w-full sm:w-auto text-gray-700 font-semibold py-4 px-8 rounded-lg hover:bg-gray-200 transition-all duration-300 inline-flex items-center justify-center gap-2 border border-gray-300">
-                                View My Work <i data-lucide="arrow-down" class="w-4 h-4"></i>
-                            </a>
+                            <a href="#contact" class="w-full sm:w-auto gradient-bg text-white font-bold py-4 px-8 rounded-lg hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">Contact Me</a>
+                            <a href="#projects" class="w-full sm:w-auto text-gray-700 font-semibold py-4 px-8 rounded-lg hover:bg-gray-200 transition-all duration-300 inline-flex items-center justify-center gap-2 border border-gray-300">View My Work <i data-lucide="arrow-down" class="w-4 h-4"></i></a>
                         </div>
-                         <div class="hero-element mt-8 flex justify-center md:justify-start space-x-6">
-                            <a id="hero-linkedin" href="#" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-blue-600 transition-colors">
-                                <i data-lucide="linkedin" class="w-8 h-8"></i>
-                            </a>
-                            <a id="hero-github" href="#" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-blue-600 transition-colors">
-                                <i data-lucide="github" class="w-8 h-8"></i>
-                            </a>
+                        <div class="hero-element mt-8 flex justify-center md:justify-start space-x-6">
+                            <a id="hero-linkedin" href="#" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-blue-600 transition-colors"><i data-lucide="linkedin" class="w-8 h-8"></i></a>
+                            <a id="hero-github" href="#" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-blue-600 transition-colors"><i data-lucide="github" class="w-8 h-8"></i></a>
                         </div>
                     </div>
                     <div class="hero-element relative flex justify-center items-center">
@@ -153,57 +185,54 @@
                 </div>
             </section>
 
-            <!-- All other sections -->
-            <div id="content-sections">
-                <!-- Projects Section -->
-                <section id="projects" class="py-24 md:py-32 section">
-                    <div class="container mx-auto">
-                        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Projects <span class="text-blue-600">Done</span></h2>
-                        <p class="text-center text-lg text-gray-600 max-w-3xl mx-auto mb-16">Here's how I've helped businesses overcome challenges with technology.</p>
-                        <div id="projects-grid" class="grid md:grid-cols-1 lg:grid-cols-3 gap-8"></div>
+            <!-- Projects Section with 3 Flip Cards -->
+            <section id="projects" class="py-24 md:py-32 section">
+                <div class="container mx-auto">
+                    <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Interactive <span class="text-blue-600">Projects</span></h2>
+                    <p class="text-center text-lg text-gray-600 max-w-3xl mx-auto mb-16">Hover or tap on a card to flip it and see the technical details of my work.</p>
+                    <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+                        <!-- Project cards will be injected by JS -->
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- Experience Section -->
-                <section id="experience" class="py-24 md:py-32 section">
-                    <div class="container mx-auto">
-                        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Professional <span class="text-blue-600">Journey</span></h2>
-                        <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-16">My career path and academic milestones.</p>
-                        <div id="experience-timeline" class="relative max-w-3xl mx-auto">
-                            <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-0.5 h-full bg-gray-200"></div>
-                        </div>
+            <!-- Experience Section with Blueprint Infographic -->
+            <section id="experience" class="py-24 md:py-32 section">
+                <div class="container mx-auto">
+                    <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">My Professional <span class="text-blue-600">Journey</span></h2>
+                    <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-16">A blueprint of my career milestones, from foundation to expertise.</p>
+                    <div id="experience-blueprint-container">
+                        <!-- Responsive blueprint/timeline will be injected here -->
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <!-- Skills Section -->
-                <section id="skills" class="py-24 md:py-32 section">
-                    <div class="container mx-auto">
-                        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Skills & <span class="text-blue-600">Tools</span></h2>
-                        <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">The technologies I work with to bring ideas to life.</p>
-                        <div id="skills-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+            <!-- Skills Section -->
+            <section id="skills" class="py-24 md:py-32 section">
+                <div class="container mx-auto">
+                    <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Skills & <span class="text-blue-600">Tools</span></h2>
+                    <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">The technologies I work with to bring ideas to life.</p>
+                    <div id="skills-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
+                </div>
+            </section>
+            
+            <!-- Contact Section -->
+            <section id="contact" class="py-24 md:py-32 section">
+                <div class="container mx-auto">
+                    <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Get In <span class="text-blue-600">Touch</span></h2>
+                    <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">I'm open to discussing new projects, creative ideas, or opportunities.</p>
+                    <div class="max-w-xl mx-auto bg-white border border-gray-200 p-8 rounded-xl shadow-sm">
+                        <form id="contact-form" class="space-y-4">
+                            <input type="text" name="name" placeholder="Your Name" required class="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+                            <input type="email" name="email" placeholder="Your Email" required class="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+                            <textarea name="message" placeholder="Your Message" rows="5" required class="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"></textarea>
+                            <button type="submit" class="w-full gradient-bg text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg hover:shadow-blue-500/40 transition-shadow">Send Message</button>
+                        </form>
                     </div>
-                </section>
-                
-                <!-- Contact Section -->
-                <section id="contact" class="py-24 md:py-32 section">
-                    <div class="container mx-auto">
-                        <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Get In <span class="text-blue-600">Touch</span></h2>
-                        <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">I'm open to discussing new projects, creative ideas, or opportunities to be part of your vision.</p>
-                        <div class="max-w-xl mx-auto card p-8 rounded-xl">
-                            <form id="contact-form" class="space-y-4">
-                                <input type="text" name="name" placeholder="Your Name" required class="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-                                <input type="email" name="email" placeholder="Your Email" required class="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-                                <textarea name="message" placeholder="Your Message" rows="5" required class="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"></textarea>
-                                <button type="submit" class="w-full gradient-bg text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg hover:shadow-blue-500/40 transition-shadow">Send Message</button>
-                                <p id="form-status" class="text-center text-gray-600 mt-4 h-6 text-sm italic">(Note: This form is for demonstration and is not currently functional.)</p>
-                            </form>
-                        </div>
-                    </div>
-                </section>
-            </div>
+                </div>
+            </section>
         </main>
 
-        <!-- Footer -->
         <footer class="text-center py-8 text-gray-500 bg-white border-t border-gray-200">
             <div id="footer-links" class="flex justify-center space-x-6 mb-4"></div>
             <p>Copyright &copy; <span id="copyright-year"></span> Manideep Karnati. All rights reserved.</p>
@@ -221,65 +250,28 @@
                 email: "manideep4942@yahoo.com",
                 linkedin: "https://www.linkedin.com/in/karnati-manideep-0b6916240",
                 github: "https://github.com/Manideep4942/DataEngineering.git",
+                blog: "https://medium.com/@manideep4942"
             },
             skills: [
-                { name: "Azure Data Factory", icon: 'factory' },
-                { name: "Azure Databricks", icon: 'box' },
-                { name: "Azure Data Lake", icon: 'database' },
-                { name: "Azure SQL", icon: 'database' },
-                { name: "Azure Blob Storage", icon: 'cloud' },
-                { name: "Python", icon: 'code' },
-                { name: "PySpark", icon: 'sparkle' },
-                { name: "SQL", icon: 'database' },
-                { name: "Pandas", icon: 'table' },
-                { name: "NumPy", icon: 'calculator' },
-                { name: "MySQL", icon: 'database' },
-                { name: "MongoDB", icon: 'database' },
-                { name: "COSMOS DB", icon: 'globe-2' },
-                { name: "ETL Development", icon: 'arrow-left-right' },
-                { name: "Key Vault", icon: 'key' },
+                { name: "Azure Data Factory", icon: 'factory' }, { name: "Azure Databricks", icon: 'box' }, { name: "Azure Data Lake", icon: 'database' }, { name: "Azure SQL", icon: 'database' }, { name: "Azure Blob Storage", icon: 'cloud' }, { name: "Python", icon: 'code' }, { name: "PySpark", icon: 'sparkle' }, { name: "SQL", icon: 'database' }, { name: "Pandas", icon: 'table' }, { name: "NumPy", icon: 'calculator' }, { name: "MySQL", icon: 'database' }, { name: "MongoDB", icon: 'database' }, { name: "COSMOS DB", icon: 'globe-2' }, { name: "ETL Development", icon: 'arrow-left-right' }, { name: "Key Vault", icon: 'key' },
             ],
             projects: [
-                { 
-                    title: "Dennis Project using Azure Data Factory", 
-                    description: "Designed and developed ETL pipelines using ADF to extract, transform, and load data from multiple sources like Excel, CSV, and COSMOS DB. Performed data cleaning and mapping, loading the final clean data into Azure SQL Database for centralized analytics.", 
-                    tech: ["Azure Data Factory", "Azure SQL", "COSMOS DB"], 
-                    githubUrl: "https://github.com/Manideep4942/DataEngineering.git", 
-                    thumbnail: "https://placehold.co/600x400/F8F9FA/212529?text=ADF+Pipeline" 
-                },
-                { 
-                    title: "Health Care using Databricks", 
-                    description: "Developed an analytics solution for healthcare insurance claims using Azure Databricks and PySpark. Ingested and transformed large volumes of healthcare data into Delta Lake to derive key business insights for insurance providers.", 
-                    tech: ["Azure Databricks", "PySpark", "Delta Lake"], 
-                    githubUrl: "https://github.com/Manideep4942/DataEngineering.git", 
-                    thumbnail: "https://placehold.co/600x400/F8F9FA/212529?text=Healthcare+Analytics" 
-                },
-                 { 
-                    title: "Investment Banking Project using Spark", 
-                    description: "Engineered a Spark-based data processing solution for an investment banking use case. Focused on high-volume data transformation, performance optimization, and delivering accurate financial analytics.", 
-                    tech: ["Apache Spark", "Python", "SQL"], 
-                    githubUrl: "https://github.com/Manideep4942/DataEngineering.git", 
-                    thumbnail: "https://placehold.co/600x400/F8F9FA/212529?text=Financial+Analytics" 
-                }
+                { title: "Dennis Project", domain: "Business Intelligence", tech: "Azure Data Factory, Azure SQL, Blob Storage", summary: "I designed and developed parameterized ETL pipelines in ADF, handling dynamic file ingestion, data cleaning, and validation before loading the transformed data into Azure SQL Database.", githubUrl: "https://github.com/Manideep4942/DataEngineering.git", frontImage: "https://placehold.co/600x450/111827/4f46e5?text=BI", backColor: "bg-gray-900" },
+                { title: "Health Care Project Using Data Bricks", domain: "Healthcare", tech: "Azure Databricks, PySpark, Delta Lake, Azure SQL", summary: "I developed a PySpark-based analytics solution to process large volumes of insurance claims, identify key business insights like most claimed diseases and rejected claims, and integrate the transformed data into Azure SQL for downstream analytics.", githubUrl: "https://github.com/Manideep4942/DataEngineering.git", frontImage: "https://placehold.co/600x450/064e3b/6ee7b7?text=Healthcare", backColor: "bg-slate-800" },
+                { title: "Investment Banking Project", domain: "Finance", tech: "Apache Spark, Python, SQL", summary: "Engineered a Spark-based data processing solution for an investment banking use case. Focused on high-volume data transformation, performance optimization, and delivering accurate financial analytics.", githubUrl: "https://github.com/Manideep4942/DataEngineering.git", frontImage: "https://placehold.co/600x450/0c4a6e/7dd3fc?text=Finance", backColor: "bg-sky-900" }
             ],
             experience: [
-                { role: "Data Engineer", company: "Hands-on Project Experience", period: "Present", description: "Designing and implementing robust, end-to-end data integration pipelines using Azure Data Factory, Databricks, and Python. Focused on ETL processes, data modeling, and migrating on-premise databases to cloud solutions like Azure Data Lake and SQL Database.", icon: 'briefcase' },
-                { role: "Bachelor of Engineering, CSE", company: "Matrusri Engineering College, Hyderabad", period: "2025 Graduate", description: "Specialized in Computer Science and Engineering, gaining a strong foundation in software development, algorithms, and database management.", icon: 'graduation-cap' },
-                { role: "Diploma, CSE", company: "Sree Dattha Institute of Engineering, Sheriguda, Ibrahimpatnam", period: "Completed", description: "Focused on core principles of computer science and engineering, building a practical skill set for a career in technology.", icon: 'graduation-cap' },
-                { role: "National Cadet Corps (NCC)", company: "Navy Wing", period: "Active Member", description: "Developed leadership, discipline, and teamwork skills through rigorous training and community service as part of the naval unit.", icon: 'anchor' }
+                { title: "Diploma in CSE", text: "Foundation of computer science principles.", icon: 'graduation-cap' },
+                { title: "B.E. Computer Science & Engineering", text: "Advanced studies and specialization.", icon: 'building' },
+                { title: "NCC (National Cadet Corps)", text: "Leadership and discipline.", icon: 'compass' },
+                { title: "Data Engineering & Pipelines", text: "Current expertise and focus.", icon: 'network' }
             ]
         };
 
-        // --- Initial Setup ---
+        // --- Initial Setup & GSAP Registration ---
         lucide.createIcons();
         document.getElementById('copyright-year').textContent = new Date().getFullYear();
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
-        // --- DOM Elements ---
-        const desktopNav = document.getElementById('desktop-nav');
-        const mobileNav = document.getElementById('mobile-nav');
-        const menuBtn = document.getElementById('menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, MotionPathPlugin);
 
         // --- Dynamic Content Injection ---
         document.getElementById('hero-bio').textContent = portfolioData.bio;
@@ -287,45 +279,134 @@
         document.getElementById('hero-linkedin').href = portfolioData.contact.linkedin;
         document.getElementById('hero-github').href = portfolioData.contact.github;
 
-        // Typing Animation
-        const typingElement = document.getElementById('typing-text');
-        const phrases = [ "Manideep Karnati.", "A Data Engineer.", "Building Data Pipelines.", "Architecting the Future of Data."];
-        let phraseIndex = 0;
-        let letterIndex = 0;
-        let currentPhrase = "";
-        let isDeleting = false;
+        // --- Projects Section: 3 Flip Cards ---
+        const projectsGrid = document.getElementById('projects-grid');
+        projectsGrid.innerHTML = '';
+        portfolioData.projects.forEach(project => {
+            projectsGrid.innerHTML += `
+                <div class="flip-card" ontouchstart="this.classList.toggle('is-flipped');">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front flex flex-col items-center justify-center p-6 bg-cover bg-center" style="background-image: url('${project.frontImage}')">
+                            <div class="bg-white/80 backdrop-blur-sm p-6 rounded-lg shadow-md text-center">
+                                <h3 class="text-2xl font-bold text-gray-800">${project.title}</h3>
+                                <div class="absolute bottom-4 right-4 bg-white/50 p-2 rounded-full">
+                                    <i data-lucide="rotate-cw" class="w-5 h-5 text-gray-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flip-card-back text-left ${project.backColor}">
+                            <h4 class="text-sm font-bold uppercase tracking-wider text-blue-300 mb-2">Domain: ${project.domain}</h4>
+                            <p class="text-sm text-gray-300 mb-4"><strong class="text-white">Key Technologies:</strong> ${project.tech}</p>
+                            <p class="text-base text-gray-200 flex-grow"><strong class="text-white">Summary:</strong> "${project.summary}"</p>
+                            <a href="${project.githubUrl}" target="_blank" rel="noopener noreferrer" class="mt-4 text-blue-300 hover:text-white font-semibold inline-flex items-center gap-2 self-start">
+                                <i data-lucide="github" class="w-5 h-5"></i> View on GitHub
+                            </a>
+                        </div>
+                    </div>
+                </div>`;
+        });
 
-        function type() {
-            const fullPhrase = phrases[phraseIndex];
-            if (isDeleting) {
-                currentPhrase = fullPhrase.substring(0, letterIndex - 1);
-                letterIndex--;
+        // --- Experience Section: Responsive Blueprint/Timeline ---
+        const blueprintContainer = document.getElementById('experience-blueprint-container');
+        
+        const renderBlueprint = () => {
+            if (window.innerWidth < 768) {
+                // Mobile: Vertical Timeline
+                blueprintContainer.innerHTML = `
+                    <div class="relative max-w-md mx-auto">
+                        <div class="absolute left-4 w-0.5 h-full bg-gray-200"></div>
+                        <div class="space-y-12 pl-12">
+                            ${portfolioData.experience.map(item => `
+                                <div class="journey-milestone-mobile relative">
+                                    <div class="absolute -left-16 top-0 w-8 h-8 bg-white border-4 border-blue-600 rounded-full z-10 flex items-center justify-center text-blue-600">
+                                        <i data-lucide="${item.icon}" class="w-4 h-4"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-800">${item.title}</h3>
+                                        <p class="text-gray-600 text-sm">${item.text}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                 gsap.from(".journey-milestone-mobile", {
+                    opacity: 0, x: -30, stagger: 0.3,
+                    scrollTrigger: { trigger: blueprintContainer, start: "top 80%" }
+                });
+
             } else {
-                currentPhrase = fullPhrase.substring(0, letterIndex + 1);
-                letterIndex++;
+                // Desktop: Horizontal Blueprint
+                blueprintContainer.innerHTML = `
+                    <div id="experience-blueprint" class="journey-blueprint rounded-2xl p-8 md:p-12">
+                        <svg id="journey-svg" class="w-full h-48" viewBox="0 0 1200 120" preserveAspectRatio="xMidYMid meet">
+                           <defs>
+                                <linearGradient id="path-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#38bdf8" />
+                                    <stop offset="100%" stop-color="#ffffff" />
+                                </linearGradient>
+                            </defs>
+                            <path id="journey-blueprint-path" d="M 50 60 H 300 L 350 20 L 400 100 L 450 60 H 650 V 60 L 750 60 C 800 60, 850 20, 900 20 C 950 20, 1000 100, 1050 100 C 1100 100, 1150 60, 1150 60" stroke="url(#path-gradient)" stroke-width="2" fill="none" />
+                        </svg>
+                        <div id="journey-milestones" class="relative -mt-24 h-48 flex justify-around items-center px-4">
+                            <!-- Milestones will be injected here -->
+                        </div>
+                    </div>
+                `;
+                const journeyMilestonesContainer = document.getElementById('journey-milestones');
+                portfolioData.experience.forEach((item) => {
+                    journeyMilestonesContainer.innerHTML += `
+                        <div class="milestone-icon group relative flex flex-col items-center text-center">
+                            <div class="w-12 h-12 bg-gray-700 border-2 border-cyan-400 rounded-full flex items-center justify-center">
+                                <i data-lucide="${item.icon}" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="milestone-text absolute top-full mt-4 w-48 text-center">
+                                <h4 class="font-bold text-white">${item.title}</h4>
+                                <p class="text-xs text-gray-400">${item.text}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                gsap.to("#journey-blueprint-path", {
+                    strokeDashoffset: 0, duration: 2, ease: "power1.inOut",
+                    scrollTrigger: {
+                        trigger: "#experience-blueprint", start: "top center", end: "bottom bottom", scrub: true,
+                        onUpdate: (self) => {
+                            const progress = self.progress;
+                            document.querySelectorAll('.milestone-icon').forEach((icon, index) => {
+                                if (progress > (index / 3) * 0.8) icon.style.opacity = '1';
+                            });
+                            document.querySelectorAll('.milestone-text').forEach((text, index) => {
+                                if (progress > (index / 3) * 0.8 + 0.1) text.style.opacity = '1';
+                            });
+                        }
+                    }
+                });
             }
+            lucide.createIcons();
+        };
 
-            typingElement.textContent = currentPhrase;
+        renderBlueprint(); // Initial render
+        window.addEventListener('resize', renderBlueprint); // Re-render on resize
 
-            let typeSpeed = 100; // Faster typing speed
-            if (isDeleting) {
-                typeSpeed /= 2;
-            }
+        // --- Skills Section ---
+        const skillsGrid = document.getElementById('skills-grid');
+        skillsGrid.innerHTML = '';
+        portfolioData.skills.forEach(skill => {
+            skillsGrid.innerHTML += `<div class="card p-4 rounded-lg text-center h-full flex flex-col justify-center items-center"><div class="flex justify-center mb-3 text-blue-600"><i data-lucide="${skill.icon}" class="w-8 h-8"></i></div><h3 class="text-sm sm:text-base font-bold text-gray-700">${skill.name}</h3></div>`;
+        });
 
-            if (!isDeleting && letterIndex === fullPhrase.length) {
-                typeSpeed = 1500; // Shorter pause
-                isDeleting = true;
-            } else if (isDeleting && letterIndex === 0) {
-                isDeleting = false;
-                phraseIndex = (phraseIndex + 1) % phrases.length;
-                typeSpeed = 300; // Shorter pause
-            }
-
-            setTimeout(type, typeSpeed);
-        }
-        type();
-
-        // Navigation Links
+        // --- Footer ---
+        const footerLinks = document.getElementById('footer-links');
+        const { email, linkedin, github } = portfolioData.contact;
+        footerLinks.innerHTML = `<a href="${linkedin}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors"><i data-lucide="linkedin" class="w-6 h-6"></i></a><a href="${github}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors"><i data-lucide="github" class="w-6 h-6"></i></a><a href="mailto:${email}" class="hover:text-blue-600 transition-colors"><i data-lucide="mail" class="w-6 h-6"></i></a>`;
+        
+        // --- Interactivity & Animations ---
+        const desktopNav = document.getElementById('desktop-nav');
+        const mobileNav = document.getElementById('mobile-nav');
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
         const navLinks = ["about", "projects", "experience", "skills", "contact"];
         let activeLink = 'about';
 
@@ -343,7 +424,7 @@
                 link.onclick = (e) => {
                     e.preventDefault();
                     scrollToSection(id);
-                    if(mobileMenu.classList.contains('hidden') === false) {
+                    if(!mobileMenu.classList.contains('hidden')) {
                         mobileMenu.classList.add('hidden');
                         menuBtn.innerHTML = `<i data-lucide="menu" class="w-7 h-7"></i>`;
                         lucide.createIcons();
@@ -362,104 +443,27 @@
                 desktopNav.appendChild(desktopLink);
                 mobileNav.appendChild(createNavLink(id));
             });
-            desktopNav.appendChild(createNavLink('blog', true, 'https://medium.com/@manideep4942'));
-            mobileNav.appendChild(createNavLink('blog', true, 'https://medium.com/@manideep4942'));
+            desktopNav.appendChild(createNavLink('blog', true, portfolioData.contact.blog));
+            mobileNav.appendChild(createNavLink('blog', true, portfolioData.contact.blog));
             lucide.createIcons();
         };
 
         const scrollToSection = (id) => {
-            const element = document.getElementById(id);
-            if (element) {
-                const offset = 80;
-                const bodyRect = document.body.getBoundingClientRect().top;
-                const elementRect = element.getBoundingClientRect().top;
-                const elementPosition = elementRect - bodyRect;
-                const offsetPosition = elementPosition - offset;
-                gsap.to(window, { duration: 0.6, scrollTo: offsetPosition, ease: "power2.out" });
-            }
+            gsap.to(window, { duration: 0.6, scrollTo: { y: `#${id}`, offsetY: 80 }, ease: "power2.out" });
         };
 
-        // Projects Section
-        const projectsGrid = document.getElementById('projects-grid');
-        portfolioData.projects.forEach(project => {
-            const techBadges = project.tech.map(t => `<span class="font-mono bg-gray-100 text-gray-700 text-xs font-medium px-2.5 py-1 rounded">${t}</span>`).join('');
-            projectsGrid.innerHTML += `
-                <div class="card rounded-xl overflow-hidden flex flex-col">
-                    <div class="overflow-hidden"><img src="${project.thumbnail}" alt="${project.title}" class="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110" /></div>
-                    <div class="p-6 flex flex-col flex-grow">
-                        <h3 class="text-xl font-bold text-blue-600 mb-2">${project.title}</h3>
-                        <p class="text-gray-600 text-sm mb-4 flex-grow">${project.description}</p>
-                        <div class="flex flex-wrap gap-2 mb-4">${techBadges}</div>
-                        <div class="mt-auto flex justify-end items-center gap-4">
-                            <a href="${project.githubUrl}" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-blue-600 transition-colors"><i data-lucide="github" class="w-6 h-6"></i></a>
-                        </div>
-                    </div>
-                </div>`;
-        });
-
-        // Experience Section
-        const experienceTimeline = document.getElementById('experience-timeline');
-        portfolioData.experience.forEach((item, index) => {
-            const icon = item.role.includes("Engineer") ? 'briefcase' : item.role.includes("Bachelor") || item.role.includes("Diploma") ? 'graduation-cap' : 'anchor';
-            experienceTimeline.innerHTML += `
-                <div class="mb-12 pl-12 md:pl-0">
-                    <div class="flex items-start md:space-x-12 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse md:space-x-reverse'}">
-                        <div class="absolute left-4 md:left-1/2 -translate-x-1/2 w-8 h-8 bg-white border-4 border-blue-600 rounded-full z-10 flex items-center justify-center text-blue-600">
-                            <i data-lucide="${icon}" class="w-4 h-4"></i>
-                        </div>
-                        <div class="w-full md:w-1/2">
-                            <div class="card p-6 rounded-lg">
-                                <p class="text-blue-600 font-semibold text-sm mb-1">${item.period}</p>
-                                <h3 class="text-lg font-bold text-gray-800 mb-1">${item.role}</h3>
-                                <p class="text-gray-700 font-medium mb-3">${item.company}</p>
-                                <p class="text-gray-600 text-sm">${item.description}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-        });
-
-        // Skills Section
-        const skillsGrid = document.getElementById('skills-grid');
-        portfolioData.skills.forEach(skill => {
-            skillsGrid.innerHTML += `
-                <div class="card p-4 rounded-lg text-center h-full flex flex-col justify-center items-center">
-                    <div class="flex justify-center mb-3 text-blue-600"><i data-lucide="${skill.icon}" class="w-8 h-8"></i></div>
-                    <h3 class="text-sm sm:text-base font-bold text-gray-700">${skill.name}</h3>
-                </div>`;
-        });
-
-        // Footer
-        const footerLinks = document.getElementById('footer-links');
-        const { email, linkedin, github } = portfolioData.contact;
-        footerLinks.innerHTML = `
-            <a href="${linkedin}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors"><i data-lucide="linkedin" class="w-6 h-6"></i></a>
-            <a href="${github}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 transition-colors"><i data-lucide="github" class="w-6 h-6"></i></a>
-            <a href="mailto:${email}" class="hover:text-blue-600 transition-colors"><i data-lucide="mail" class="w-6 h-6"></i></a>
-        `;
-
-        // --- Interactivity ---
         menuBtn.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
             menuBtn.innerHTML = mobileMenu.classList.contains('hidden') ? `<i data-lucide="menu" class="w-7 h-7"></i>` : `<i data-lucide="x" class="w-7 h-7"></i>`;
             lucide.createIcons();
         });
-        
-        // --- GSAP Animations ---
-        gsap.from(".hero-element", { duration: 0.8, y: 30, opacity: 0, stagger: 0.15, ease: "power3.out", delay: 0.2 });
-        document.querySelectorAll('.section').forEach(section => {
-            gsap.from(section, {
-                opacity: 0, y: 50, duration: 0.8, ease: 'power3.out',
-                scrollTrigger: { trigger: section, start: 'top 85%', toggleActions: 'play none none none' }
-            });
-        });
 
-        // Scrollspy
+        gsap.from(".hero-element", { duration: 0.8, y: 30, opacity: 0, stagger: 0.15, ease: "power3.out", delay: 0.2 });
+        
         window.addEventListener('scroll', () => {
             let current = 'about';
             document.querySelectorAll('section').forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (pageYOffset >= sectionTop - 100) {
+                if (pageYOffset >= section.offsetTop - 100) {
                     current = section.getAttribute('id');
                 }
             });
@@ -469,6 +473,26 @@
             }
         });
         
+        // Typing Animation
+        const typingElement = document.getElementById('typing-text');
+        const phrases = [ "Manideep Karnati.", "A Data Engineer.", "Cloud Enthusiast."];
+        let phraseIndex = 0, letterIndex = 0, currentPhrase = "", isDeleting = false;
+        function type() {
+            const fullPhrase = phrases[phraseIndex];
+            if (isDeleting) currentPhrase = fullPhrase.substring(0, letterIndex--);
+            else currentPhrase = fullPhrase.substring(0, letterIndex++);
+            typingElement.textContent = currentPhrase;
+            let typeSpeed = 100;
+            if (isDeleting) typeSpeed /= 2;
+            if (!isDeleting && letterIndex === fullPhrase.length + 1) {
+                typeSpeed = 2000; isDeleting = true;
+            } else if (isDeleting && letterIndex === 0) {
+                isDeleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; typeSpeed = 500;
+            }
+            setTimeout(type, typeSpeed);
+        }
+        type();
+
         // Three.js Background
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -487,8 +511,7 @@
         const points = new THREE.Points(geometry, material);
         scene.add(points);
 
-        let mouseX = 0;
-        let mouseY = 0;
+        let mouseX = 0, mouseY = 0;
         document.addEventListener('mousemove', (event) => {
             mouseX = event.clientX;
             mouseY = event.clientY;
@@ -496,14 +519,10 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            points.rotation.y += 0.0001;
-            points.rotation.x += 0.0001;
-            
             const targetX = (mouseX / window.innerWidth - 0.5) * 0.5;
             const targetY = (mouseY / window.innerHeight - 0.5) * 0.5;
             points.rotation.y += .02 * (targetX - points.rotation.y);
             points.rotation.x += .02 * (targetY - points.rotation.x);
-
             renderer.render(scene, camera);
         }
         animate();
@@ -514,6 +533,7 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
         
+        // --- Final Initialization ---
         updateNavLinks();
         lucide.createIcons();
     });
