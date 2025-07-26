@@ -126,7 +126,7 @@
         .milestone-text {
             transition-delay: 0.3s;
         }
-        .card { /* For skills section */
+        .card { /* For skills & contact section */
             background: white;
             border: 1px solid #e5e7eb;
             transition: box-shadow 0.3s, transform 0.3s;
@@ -169,7 +169,7 @@
                         <p class="hero-element text-lg text-gray-600 max-w-xl mx-auto md:mx-0 mb-8" id="hero-bio"></p>
                         <div class="hero-element flex flex-col sm:flex-row justify-center md:justify-start items-center gap-4">
                             <a href="#contact" class="w-full sm:w-auto gradient-bg text-white font-bold py-4 px-8 rounded-lg hover:shadow-lg hover:shadow-blue-500/30 transition-all duration-300">Contact Me</a>
-                            <a href="#projects" class="w-full sm:w-auto text-gray-700 font-semibold py-4 px-8 rounded-lg hover:bg-gray-200 transition-all duration-300 inline-flex items-center justify-center gap-2 border border-gray-300">View My Work <i data-lucide="arrow-down" class="w-4 h-4"></i></a>
+                            <a href="https://drive.google.com/file/d/1klLm6S3uO61hSAQy7t1UwEn1Rwt16zMi/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto text-gray-700 font-semibold py-4 px-8 rounded-lg hover:bg-gray-200 transition-all duration-300 inline-flex items-center justify-center gap-2 border border-gray-300">View Resume <i data-lucide="file-text" class="w-4 h-4"></i></a>
                         </div>
                         <div class="hero-element mt-8 flex justify-center md:justify-start space-x-6">
                             <a id="hero-linkedin" href="#" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-blue-600 transition-colors"><i data-lucide="linkedin" class="w-8 h-8"></i></a>
@@ -220,14 +220,24 @@
             <section id="contact" class="py-24 md:py-32 section">
                 <div class="container mx-auto">
                     <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Get In <span class="text-blue-600">Touch</span></h2>
-                    <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">I'm open to discussing new projects, creative ideas, or opportunities.</p>
-                    <div class="max-w-xl mx-auto bg-white border border-gray-200 p-8 rounded-xl shadow-sm">
-                        <form id="contact-form" class="space-y-4">
-                            <input type="text" name="name" placeholder="Your Name" required class="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-                            <input type="email" name="email" placeholder="Your Email" required class="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
-                            <textarea name="message" placeholder="Your Message" rows="5" required class="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"></textarea>
-                            <button type="submit" class="w-full gradient-bg text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg hover:shadow-blue-500/40 transition-shadow">Send Message</button>
-                        </form>
+                    <p class="text-center text-lg text-gray-600 max-w-2xl mx-auto mb-12">Feel free to reach out. The best ways to contact me are via email or phone.</p>
+                    <div class="max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Email Card -->
+                        <a href="mailto:manideep4942@yahoo.com" class="card p-8 rounded-xl text-center flex flex-col items-center justify-center bg-white shadow-sm">
+                            <div class="bg-blue-100 p-4 rounded-full mb-4">
+                                <i data-lucide="mail" class="w-10 h-10 text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-1">Email</h3>
+                            <p class="text-gray-600 hover:text-blue-600 transition-colors">manideep4942@yahoo.com</p>
+                        </a>
+                        <!-- Phone Card -->
+                        <a href="tel:6305534942" class="card p-8 rounded-xl text-center flex flex-col items-center justify-center bg-white shadow-sm">
+                            <div class="bg-blue-100 p-4 rounded-full mb-4">
+                                <i data-lucide="phone" class="w-10 h-10 text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-1">Phone</h3>
+                            <p class="text-gray-600">6305534942</p>
+                        </a>
                     </div>
                 </div>
             </section>
@@ -245,9 +255,10 @@
         const portfolioData = {
             name: "Manideep Karnati",
             bio: "Motivated and detail-oriented graduate in Computer Science with a strong interest in Data Engineering. I specialize in leveraging Azure services to design, build, and optimize robust data pipelines that turn complex data into actionable insights.",
-            photoUrl: "https://placehold.co/400x400/007BFF/FFFFFF?text=M",
+            photoUrl: "https://raw.githubusercontent.com/Manideep4942/photo/main/mani2.jpg",
             contact: {
                 email: "manideep4942@yahoo.com",
+                phone: "6305534942",
                 linkedin: "https://www.linkedin.com/in/karnati-manideep-0b6916240",
                 github: "https://github.com/Manideep4942/DataEngineering.git",
                 blog: "https://medium.com/@manideep4942"
@@ -493,37 +504,54 @@
         }
         type();
 
-        // Three.js Background
+        // --- Enhanced Three.js Background ---
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#three-bg'), alpha: true });
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        camera.position.setZ(30);
+        camera.position.setZ(50);
 
-        const geometry = new THREE.BufferGeometry();
-        const count = 2000;
-        const positions = new Float32Array(count * 3);
-        for(let i = 0; i < count * 3; i++) positions[i] = (Math.random() - 0.5) * 100;
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 5000;
+        const posArray = new Float32Array(particlesCount * 3);
+        
+        for (let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * (Math.random() * 5) * 100;
+        }
 
-        const material = new THREE.PointsMaterial({ size: 0.15, color: 0x007BFF });
-        const points = new THREE.Points(geometry, material);
-        scene.add(points);
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
-        let mouseX = 0, mouseY = 0;
+        const particlesMaterial = new THREE.PointsMaterial({
+            size: 0.2,
+            color: 0x007BFF, // Set a single blue color
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+        });
+
+        const particleMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particleMesh);
+
+        let mouseX = 0;
+        let mouseY = 0;
         document.addEventListener('mousemove', (event) => {
             mouseX = event.clientX;
             mouseY = event.clientY;
         });
 
+        const clock = new THREE.Clock();
         function animate() {
-            requestAnimationFrame(animate);
-            const targetX = (mouseX / window.innerWidth - 0.5) * 0.5;
-            const targetY = (mouseY / window.innerHeight - 0.5) * 0.5;
-            points.rotation.y += .02 * (targetX - points.rotation.y);
-            points.rotation.x += .02 * (targetY - points.rotation.x);
+            const elapsedTime = clock.getElapsedTime();
+            particleMesh.rotation.y = -0.05 * elapsedTime;
+            
+            // Mouse interaction
+            const targetX = mouseX * 0.001;
+            const targetY = mouseY * 0.001;
+            particleMesh.rotation.x += 0.05 * (targetY - particleMesh.rotation.x);
+            particleMesh.rotation.y += 0.05 * (targetX - particleMesh.rotation.y);
+
             renderer.render(scene, camera);
+            window.requestAnimationFrame(animate);
         }
         animate();
         
